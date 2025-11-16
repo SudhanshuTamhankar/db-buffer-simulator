@@ -1,0 +1,12 @@
+*.o
+*.png
+*.csv
+*testpf
+*test_read_heavy
+*test_write_heavy
+file1
+file2
+read_heavy_file
+write_heavy_file
+pflayer.o
+my_plot_env/

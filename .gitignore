@@ -1,0 +1,27 @@
+
+# Compiled Object Files
+*.o
+
+# Executables
+pflayer/testpf
+pflayer/test_read_heavy
+pflayer/test_write_heavy
+rmlayer/testrm
+amlayer/testam
+
+# Data files and test files
+*.db
+*.0
+*.csv
+*.png
+testrel.0
+file1
+file2
+read_heavy_file
+write_heavy_file
+student_records.db
+student_records.0
+
+# Python environment
+my_plot_env/
+

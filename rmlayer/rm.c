@@ -382,18 +382,20 @@ int RM_GetNextRec(RM_ScanHandle *sh, char *record_data, RID *rid) {
         if (sh->currentPageNum == -1) { 
             // This is the first call. Get the first page.
             pf_err = PF_GetNextPage(sh->fh->pf_fd, &sh->currentPageNum, &pageBuf);
+            if (pf_err == PFE_EOF) {
+                return RM_EOF;
+            }
+            if (pf_err != PFE_OK) {
+                return pf_err;
+            }
             sh->currentSlotNum = 0; // Start scan from slot 0
         } else {
             // We are in the middle of a scan. Re-get the *current* page.
             pf_err = PF_GetThisPage(sh->fh->pf_fd, sh->currentPageNum, &pageBuf);
-        }
-
-        // Check if we're at the end of the file or hit an error
-        if (pf_err == PFE_EOF) {
-            return RM_EOF;
-        }
-        if (pf_err != PFE_OK) {
-            return pf_err;
+            if (pf_err != PFE_OK) {
+                // Page doesn't exist, we've gone past EOF
+                return RM_EOF;
+            }
         }
 
         // We have a valid page, get its header
@@ -424,32 +426,12 @@ int RM_GetNextRec(RM_ScanHandle *sh, char *record_data, RID *rid) {
         }
 
         // 7. If we're here, we scanned all slots on this page.
-        // Unfix the page and prepare to get the next one.
+        // Unfix the page and advance to the next page.
         PF_UnfixPage(sh->fh->pf_fd, sh->currentPageNum, FALSE);
         
-        // This will advance sh->currentPageNum to the next page number
-        // The loop will then restart
-        pf_err = PF_GetNextPage(sh->fh->pf_fd, &sh->currentPageNum, &pageBuf);
+        // Advance to next page for the next iteration
+        sh->currentPageNum++;
         
-        // Check if that was the last page
-        if (pf_err == PFE_EOF) {
-            return RM_EOF;
-        }
-        if (pf_err != PFE_OK) {
-            return pf_err;
-        }
-
-        // We found a new page, but we must unfix it immediately.
-        // The loop will start over, `PF_GetThisPage` will fetch it,
-        // and we'll scan its slots.
-        PF_UnfixPage(sh->fh->pf_fd, sh->currentPageNum, FALSE);
-        
-        // We need to decrement currentPageNum because GetNextPage
-        // *already* advanced it, but the loop needs the *previous*
-        // page number to advance *from* for the *next* GetNextPage call.
-        // This is a subtle part of the PF_GetNextPage iterator.
-        sh->currentPageNum--;
-
         // Reset slot to 0 so we scan the new page from the beginning
         sh->currentSlotNum = 0;
     }

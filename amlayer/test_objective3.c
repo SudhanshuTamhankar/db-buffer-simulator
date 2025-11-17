@@ -14,7 +14,7 @@
 #define ATTR_TYPE 'i'
 #define ATTR_LEN sizeof(int)
 
-#define NUM_RECORDS 200 // Reduced for quicker debug runs
+#define NUM_RECORDS 1000
 
 /* Struct to hold the stats for one run */
 typedef struct {
@@ -105,10 +105,6 @@ void method1_BuildFromExisting(MethodStats *stats) {
     while((err = RM_GetNextRec(&rm_sh, record_data, &rid)) != RM_EOF) {
         sscanf(record_data, "Student_Name_%d", &key);
         int packed_rid = pack_rid(rid);
-        // Debug: show progress for early failures
-        if (count < 5) {
-            printf("Inserting key=%d (page=%d, slot=%d)\n", key, rid.pageNum, rid.slotNum);
-        }
         err = AM_InsertEntry(am_fd, ATTR_TYPE, ATTR_LEN, (char *)&key, packed_rid);
         if (err != AME_OK) { AM_PrintError("AM_InsertEntry"); exit(1); }
         count++;

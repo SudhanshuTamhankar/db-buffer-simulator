@@ -281,9 +281,14 @@ int AM_FindNextEntry(int scanDesc) {
   while (header->numKeys == 0) {
     if (header->nextLeafPage == AM_NULL_PAGE) {
       AM_scanTable[scanDesc].status = OVER;
-      errVal = PF_UnfixPage(AM_scanTable[scanDesc].fileDesc,
-                            AM_scanTable[scanDesc].nextpageNum, FALSE);
-      AM_Check(errVal);
+      fprintf(stderr, "DEBUG AM_FindNextEntry -> PF_UnfixPage: scanDesc=%d fd=%d unfixing nextpageNum=%d pageNum=%d\n",
+          scanDesc, AM_scanTable[scanDesc].fileDesc,
+          AM_scanTable[scanDesc].nextpageNum, AM_scanTable[scanDesc].pageNum);
+        fprintf(stderr, "DEBUG AM_FindNextEntry -> PF_UnfixPage: scanDesc=%d fd=%d unfixing header->nextLeafPage=%d\n",
+                scanDesc, AM_scanTable[scanDesc].fileDesc, header->nextLeafPage);
+        errVal = PF_UnfixPage(AM_scanTable[scanDesc].fileDesc,
+                      header->nextLeafPage, FALSE);
+        AM_Check(errVal);
       return (AME_EOF);
     } else {
       int prevPageNum = AM_scanTable[scanDesc].nextpageNum;
@@ -319,11 +324,16 @@ int AM_FindNextEntry(int scanDesc) {
     if ((AM_scanTable[scanDesc].lastpageNum <=
          AM_scanTable[scanDesc].nextpageNum) &&
         (AM_scanTable[scanDesc].lastIndex == 0)) {
-      AM_scanTable[scanDesc].status = OVER;
-      errVal = PF_UnfixPage(AM_scanTable[scanDesc].fileDesc,
-                            AM_scanTable[scanDesc].nextpageNum, FALSE);
-      AM_Check(errVal);
-      return (AME_EOF);
+        AM_scanTable[scanDesc].status = OVER;
+        fprintf(stderr, "DEBUG AM_FindNextEntry -> PF_UnfixPage: scanDesc=%d fd=%d unfixing nextpageNum=%d pageNum=%d\n",
+          scanDesc, AM_scanTable[scanDesc].fileDesc,
+          AM_scanTable[scanDesc].nextpageNum, AM_scanTable[scanDesc].pageNum);
+        fprintf(stderr, "DEBUG AM_FindNextEntry -> PF_UnfixPage: scanDesc=%d fd=%d unfixing header->nextLeafPage=%d\n",
+                scanDesc, AM_scanTable[scanDesc].fileDesc, header->nextLeafPage);
+        errVal = PF_UnfixPage(AM_scanTable[scanDesc].fileDesc,
+                      header->nextLeafPage, FALSE);
+        AM_Check(errVal);
+        return (AME_EOF);
     }
   }
 

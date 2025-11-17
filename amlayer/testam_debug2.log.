@@ -1,0 +1,66 @@
+DEBUG PFhashInit: initializing hash table
+DEBUG PFhashFind: searching fd=0 page=0
+DEBUG PFhashFind: NOT FOUND fd=0 page=0 (bucket=0)
+DEBUG PFhashInsert: attempt insert fd=0 page=0
+DEBUG PFhashFind: searching fd=0 page=0
+DEBUG PFhashFind: NOT FOUND fd=0 page=0 (bucket=0)
+DEBUG PFhashInsert: inserted fd=0 page=0 into bucket=0 (bpage=0x5c7955a612d0)
+DEBUG PF_AllocPage: PFbufAlloc succeeded for fd=0 pagenum=0 (fpage=0x5c7955a612ec)
+DEBUG PFhashFind: searching fd=0 page=0
+DEBUG PFhashFind: FOUND fd=0 page=0 (bucket=0)
+DEBUG PF_UnfixPage called: fd=0 pagenum=0 dirty=1
+DEBUG PFhashFind: searching fd=0 page=0
+DEBUG PFhashFind: FOUND fd=0 page=0 (bucket=0)
+DEBUG PFhashFind: searching fd=0 page=0
+DEBUG PFhashFind: FOUND fd=0 page=0 (bucket=0)
+DEBUG PFbufUnfix: called: fd=0 pagenum=0 dirty=1 (fixed_before=-1, dirty_before=0)
+DEBUG PFbufUnfix: ERROR: page already unfixed: fd=0 pagenum=0 (fixed=-1)
+DEBUG PFbufUnfix: PF hash table dump:
+DEBUG PFbufUnfix: PF buffer list dump:
+buffer content:
+fd	page	fixed	dirty	fpage
+0	0	-1	0	0x5c7955a612f0
+RM_InsertRec:page already unfixed
+
+--- Method 1: Building index from (pre-sorted) file ---
+Populating data file with 200 sorted records...
+bucket 0
+	fd: 0, page: 0, bpage: 0x5c7955a612d0
+bucket 1
+	empty
+bucket 2
+	empty
+bucket 3
+	empty
+bucket 4
+	empty
+bucket 5
+	empty
+bucket 6
+	empty
+bucket 7
+	empty
+bucket 8
+	empty
+bucket 9
+	empty
+bucket 10
+	empty
+bucket 11
+	empty
+bucket 12
+	empty
+bucket 13
+	empty
+bucket 14
+	empty
+bucket 15
+	empty
+bucket 16
+	empty
+bucket 17
+	empty
+bucket 18
+	empty
+bucket 19
+	empty

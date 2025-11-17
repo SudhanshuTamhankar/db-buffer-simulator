@@ -241,15 +241,18 @@ int AM_InsertEntry(int fileDesc, char attrType, int attrLength, char *value,
 
   /*
    * ========================================================
-   * BUG FIX: Do NOT empty the stack if insert succeeded.
+   * BUG FIX: Empty stack after successful insert.
    * ========================================================
    */
   if (inserted == TRUE) {
+    // fprintf(stderr, "DEBUG AM_InsertEntry -> PF_UnfixPage: fileDesc=%d pageNum=%d (after insert)\n",
+    //         fileDesc, pageNum);
     errVal = PF_UnfixPage(fileDesc, pageNum, TRUE);
     AM_Check(errVal);
-    /* AM_EmptyStack(); <--- THIS WAS THE BUG */
+    AM_EmptyStack(); /* Clear the stack after successful insert */
     return (AME_OK);
   }
+
 
   /* check if there is any error */
   if (inserted < 0) {

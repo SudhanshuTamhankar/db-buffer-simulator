@@ -1,44 +1,44 @@
-# Makefile for the AM (Access Method) Layer
+# amlayer/Makefile - builds AM test program and ensures PF & RM are built
 
-# Compiler
 CC = cc
-
-# Flags
-# -I../pflayer tells the compiler to look in the pflayer dir for pf.h
-# -I../rmlayer tells the compiler to look in the rmlayer dir for rm.h
 CFLAGS = -g -Wall -I../pflayer -I../rmlayer
 
-# --- PF Layer ---
-PF_LIB = ../pflayer/pflayer.o
+# Paths to subprojects (we call their make)
+PF_DIR = ../pflayer
+RM_DIR = ../rmlayer
 
-# --- RM Layer ---
-RM_LIB = ../rmlayer/rm.o
-
-# --- AM Layer ---
-# Source files for the AM layer, including misc.c
+# Objects (AM)
 AM_SRC = am.c amfns.c amglobals.c aminsert.c amprint.c amscan.c amsearch.c amstack.c misc.c
 AM_OBJ = $(AM_SRC:.c=.o)
 
-# --- Test Executable ---
-# We build 'testam' from 'test_objective3.c'
 TEST_EXEC = testam
 TEST_SRC = test_objective3.c
-TEST_OBJ = test_objective3.o
+TEST_OBJ = $(TEST_SRC:.c=.o)
 
-# --- Build Rules ---
+# PF and RM library object files (built by their make)
+PF_LIB = $(PF_DIR)/pflayer.o
+RM_LIB = $(RM_DIR)/rm.o
 
-# Default target: build the test executable
-all: $(TEST_EXEC)
+.PHONY: all pf rm clean
+
+all: pf rm $(TEST_EXEC)
+
+# Build PF layer (calls make in pflayer)
+pf:
+	@$(MAKE) -C $(PF_DIR)
+
+# Build RM layer (calls make in rmlayer)
+rm:
+	@$(MAKE) -C $(RM_DIR)
 
 # Link the final executable
 $(TEST_EXEC): $(TEST_OBJ) $(AM_OBJ) $(RM_LIB) $(PF_LIB)
 	$(CC) $(CFLAGS) -o $(TEST_EXEC) $(TEST_OBJ) $(AM_OBJ) $(RM_LIB) $(PF_LIB)
 
-# --- Dependencies ---
-# Tell make that all .o files depend on the headers
-# This lets make use its built-in .c -> .o rules
+# Let make build .o from .c using defaults but ensure headers are noted
 $(TEST_OBJ) $(AM_OBJ): am.h testam.h ../rmlayer/rm.h ../pflayer/pf.h
 
-# Clean rule
 clean:
-	rm -f $(TEST_EXEC) *.o *.0 testrel.0 student_records.db student_records.0
+	@$(MAKE) -C $(PF_DIR) clean || true
+	@$(MAKE) -C $(RM_DIR) clean || true
+	-rm -f $(TEST_EXEC) *.o

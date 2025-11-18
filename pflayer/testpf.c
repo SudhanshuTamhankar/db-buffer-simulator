@@ -75,7 +75,6 @@ int main(int argc, char **argv) {
     PF_SetStrategy(PF_LRU);
     strcpy(strategy_name, "LRU");
   }
-  /* END OF THE PART YOU WERE MISSING */
   
   Q_PRINTF("\n*** STRATEGY SET TO %s ***\n\n", strategy_name);
   /* ==========================================================

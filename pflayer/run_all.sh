@@ -31,5 +31,14 @@ echo "Running: Write-Heavy (MRU)"
 rm -f write_heavy_file # Cleanup
 echo "2" | ./test_write_heavy -q >> data.csv
 
+# --- Cyclic Access Test (shows LRU vs MRU difference) ---
+echo "Running: Cyclic (LRU)"
+rm -f cyclic_file # Cleanup
+echo "0" | ./test_cyclic -q >> data.csv
+
+echo "Running: Cyclic (MRU)"
+rm -f cyclic_file # Cleanup
+echo "1" | ./test_cyclic -q >> data.csv
+
 echo "Done. Your data is in data.csv"
 cat data.csv

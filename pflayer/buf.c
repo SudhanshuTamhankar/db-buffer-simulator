@@ -129,12 +129,21 @@ static int PFbufInternalAlloc(PFbpage **bpage, int (*writefcn)(int,int,PFfpage *
         return PFE_OK;
     }
 
-    /* else must evict LRU (tail) */
-    victim = PFlastbpage;
-    /* find a non-fixed victim walking backward */
-    while (victim != NULL && victim->fixed) {
-        victim = victim->prevpage;
+    /* else must evict - strategy determines whether we evict LRU (tail) or MRU (head) */
+    if (pf_strategy == PF_LRU) {
+        /* LRU: start from tail and walk backward to find non-fixed page */
+        victim = PFlastbpage;
+        while (victim != NULL && victim->fixed) {
+            victim = victim->prevpage;
+        }
+    } else {
+        /* MRU: start from head and walk forward to find non-fixed page */
+        victim = PFfirstbpage;
+        while (victim != NULL && victim->fixed) {
+            victim = victim->nextpage;
+        }
     }
+    
     if (victim == NULL) {
         /* no victim (all pages fixed) */
         PFerrno = PFE_NOBUF; /* no buffer space available */
@@ -266,6 +275,10 @@ int PFbufGet(int fd, int pagenum, PFfpage **fpageptr,
     /* look for page in hash */
     b = PFhashFind(fd, pagenum);
     if (b != NULL) {
+        /* Page found in buffer (cache hit) - increment logical reads */
+        extern PFstats pf_stats;
+        pf_stats.logical_reads++;
+        
         /* if already fixed, return PFE_PAGEFIXED per PF semantics.
          * IMPORTANT: 'fixed' is a 1-bit boolean in PFbpage; do not increment.
          */
@@ -292,6 +305,10 @@ int PFbufGet(int fd, int pagenum, PFfpage **fpageptr,
     }
 
     /* not present: allocate frame */
+    /* Increment logical reads for cache miss (still a logical access) */
+    extern PFstats pf_stats;
+    pf_stats.logical_reads++;
+    
     rc = PFbufInternalAlloc(&b, writefcn);
     if (rc != PFE_OK) return rc;
 
